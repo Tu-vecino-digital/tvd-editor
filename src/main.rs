@@ -1,9 +1,4 @@
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    process::Command,
-    thread::spawn,
-};
+use std::{fs, path::PathBuf, process::Command, thread::spawn};
 
 use directories::UserDirs;
 
@@ -11,24 +6,34 @@ const PROJECT_GIT_URL: &str = "https://github.com/Tu-vecino-digital/tvd-web";
 const PROJECT_FOLDER_NAME: &str = "tvd-web";
 
 fn main() {
-    let user_dirs = UserDirs::new().unwrap();
-    let document_dir = user_dirs.document_dir().unwrap();
-    let project_path = document_dir.join(PROJECT_FOLDER_NAME);
+    let path = project_path();
 
-    if project_already_exists(&project_path) {
-        update_project(&project_path);
+    if project_already_exists(&path.project_path) {
+        update_project(&path.project_path);
     } else {
-        clone_project(document_dir);
+        clone_project(&path.installation_path);
     }
 
-    install_dependencies(&project_path);
+    install_dependencies(&path.project_path);
     spawn(|| {
-        let user_dirs = UserDirs::new().unwrap();
-        let document_dir = user_dirs.document_dir().unwrap();
-        let project_path = document_dir.join(PROJECT_FOLDER_NAME);
-        start_project(&project_path);
+        start_project(&project_path().project_path);
     });
     try_open_browser_tab();
+}
+
+struct ProjectPath {
+    project_path: PathBuf,
+    installation_path: PathBuf,
+}
+
+fn project_path() -> ProjectPath {
+    let user_dirs = UserDirs::new().unwrap();
+    let document_dir = user_dirs.document_dir().unwrap();
+
+    ProjectPath {
+        installation_path: document_dir.to_path_buf(),
+        project_path: document_dir.join(PROJECT_FOLDER_NAME),
+    }
 }
 
 fn try_open_browser_tab() {
@@ -55,7 +60,7 @@ fn update_project(project_path: &PathBuf) {
     assert!(status.success(), "Failed updating project.");
 }
 
-fn clone_project(installation_path: &Path) {
+fn clone_project(installation_path: &PathBuf) {
     let status = Command::new("git")
         .current_dir(installation_path)
         .arg("clone")
