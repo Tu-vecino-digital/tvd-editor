@@ -37,7 +37,6 @@ fn project_path() -> ProjectPath {
 }
 
 fn try_open_browser_tab() {
-    println!("hello?");
     let url = "http://localhost:4321";
     webbrowser::open(url).expect(
         format!("Failed opening a web browser for you. Please open a new browser tab at {url}")
