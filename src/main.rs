@@ -1,4 +1,10 @@
-use std::{fs, path::PathBuf, process::Command, thread::spawn};
+use std::{
+    fs,
+    path::PathBuf,
+    process::Command,
+    thread::{self, sleep},
+    time::Duration,
+};
 
 use directories::UserDirs;
 
@@ -15,10 +21,12 @@ fn main() {
     }
 
     install_dependencies(&path.project_path);
-    spawn(|| {
-        start_project(&project_path().project_path);
+    thread::spawn(|| {
+        let one_second = Duration::from_secs(1);
+        sleep(one_second);
+        try_open_browser_tab();
     });
-    try_open_browser_tab();
+    start_project(&path.project_path);
 }
 
 struct ProjectPath {
