@@ -6,6 +6,7 @@ const PROJECT_FOLDER_NAME: &str = "tvd-web";
 fn main() {
     clone_project();
     install_dependencies();
+    start_project();
 }
 
 fn clone_project() {
@@ -24,4 +25,13 @@ fn install_dependencies() {
         .status()
         .expect("Failed launching bun. Do you have it installed?");
     assert!(status.success(), "Failed during dependency installation.");
+}
+
+fn start_project() {
+    Command::new("bun")
+        .current_dir(PROJECT_FOLDER_NAME)
+        .arg("run")
+        .arg("dev")
+        .status()
+        .expect("Failed starting project.");
 }
