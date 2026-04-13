@@ -1,12 +1,31 @@
-use std::process::Command;
+use std::{fs, process::Command};
 
 const PROJECT_GIT_URL: &str = "https://github.com/Tu-vecino-digital/tvd-web";
 const PROJECT_FOLDER_NAME: &str = "tvd-web";
 
 fn main() {
-    clone_project();
+    if project_already_exists() {
+        update_project();
+    } else {
+        clone_project();
+    }
     install_dependencies();
     start_project();
+}
+
+fn project_already_exists() -> bool {
+    fs::exists(PROJECT_FOLDER_NAME).expect(
+        "Failed checking if project folder already exists. Could it be missing permissions?",
+    )
+}
+
+fn update_project() {
+    let status = Command::new("git")
+        .current_dir(PROJECT_FOLDER_NAME)
+        .arg("pull")
+        .status()
+        .expect("Failed launching git. Do you have it installed?");
+    assert!(status.success(), "Failed updating project.");
 }
 
 fn clone_project() {
