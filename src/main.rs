@@ -2,6 +2,7 @@ use std::{
     fs,
     path::{Path, PathBuf},
     process::Command,
+    thread::spawn,
 };
 
 use directories::UserDirs;
@@ -19,8 +20,24 @@ fn main() {
     } else {
         clone_project(document_dir);
     }
+
     install_dependencies(&project_path);
-    start_project(&project_path);
+    spawn(|| {
+        let user_dirs = UserDirs::new().unwrap();
+        let document_dir = user_dirs.document_dir().unwrap();
+        let project_path = document_dir.join(PROJECT_FOLDER_NAME);
+        start_project(&project_path);
+    });
+    try_open_browser_tab();
+}
+
+fn try_open_browser_tab() {
+    println!("hello?");
+    let url = "http://localhost:4321";
+    webbrowser::open(url).expect(
+        format!("Failed opening a web browser for you. Please open a new browser tab at {url}")
+            .as_str(),
+    );
 }
 
 fn project_already_exists(project_path: &PathBuf) -> bool {
