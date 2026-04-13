@@ -22,8 +22,7 @@ fn main() {
 
     install_dependencies(&path.project_path);
     thread::spawn(|| {
-        let one_second = Duration::from_secs(1);
-        sleep(one_second);
+        sleep(Duration::from_secs(2));
         try_open_browser_tab();
     });
     start_project(&path.project_path);
